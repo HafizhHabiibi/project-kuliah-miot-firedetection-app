@@ -11,7 +11,7 @@ class ChartScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'RIWAYAT DATA',
+            'RIWAYAT DATA SENSOR (24 JAM TERAKHIR)',
             style: TextStyle(
               fontSize: 11,
               color: Color(0xFF8888AA),
@@ -20,21 +20,24 @@ class ChartScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _ChartCard(
-            title: 'Suhu (°C)',
+            title: 'Suhu (°C) - DHT22',
             color: const Color(0xFFE24B4A),
-            points: const [30.1, 30.5, 31.0, 31.2, 30.8, 31.5, 31.2],
+            points: const [29.5, 31.0, 32.5, 34.0, 36.4, 33.2, 31.2],
+            unit: '°C',
           ),
           const SizedBox(height: 10),
           _ChartCard(
-            title: 'Kelembaban (%)',
+            title: 'Kelembaban (%) - DHT22',
             color: const Color(0xFF5D9CF5),
-            points: const [72.0, 74.5, 75.0, 76.6, 77.0, 76.0, 76.6],
+            points: const [75.0, 71.2, 68.0, 65.5, 62.1, 64.0, 68.5],
+            unit: '%',
           ),
           const SizedBox(height: 10),
           _ChartCard(
-            title: 'Kualitas Udara (ppm)',
-            color: const Color(0xFF4CAF50),
-            points: const [380, 390, 405, 400, 395, 410, 400],
+            title: 'Indeks Asap (%) - MQ-2',
+            color: const Color(0xFFF59E0B),
+            points: const [12.0, 15.5, 35.0, 52.3, 70.2, 45.0, 22.5],
+            unit: '%',
           ),
         ],
       ),
@@ -46,11 +49,13 @@ class _ChartCard extends StatelessWidget {
   final String title;
   final Color color;
   final List<double> points;
+  final String unit;
 
   const _ChartCard({
     required this.title,
     required this.color,
     required this.points,
+    required this.unit,
   });
 
   @override
@@ -81,11 +86,11 @@ class _ChartCard extends StatelessWidget {
               ),
               Text(
                 latest % 1 == 0
-                    ? latest.toInt().toString()
-                    : latest.toStringAsFixed(1),
+                    ? '${latest.toInt()}$unit'
+                    : '${latest.toStringAsFixed(1)}$unit',
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                   color: color,
                 ),
               ),
@@ -104,14 +109,14 @@ class _ChartCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Min: $minVal',
+                'Min: $minVal$unit',
                 style: const TextStyle(
                   fontSize: 11,
                   color: Color(0xFF8888AA),
                 ),
               ),
               Text(
-                'Max: $maxVal',
+                'Max: $maxVal$unit',
                 style: const TextStyle(
                   fontSize: 11,
                   color: Color(0xFF8888AA),
@@ -160,7 +165,7 @@ class _LinePainter extends CustomPainter {
 
     canvas.drawPath(
       fillPath,
-      Paint()..color = color.withOpacity(0.12),
+      Paint()..color = color.withAlpha((0.12 * 255).toInt()),
     );
     canvas.drawPath(
       path,

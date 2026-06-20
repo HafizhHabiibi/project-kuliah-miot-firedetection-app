@@ -7,30 +7,31 @@ class AlertScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final alerts = [
       _AlertData(
-        title: 'Kelembaban Tinggi',
-        message: 'Kelembaban mencapai 76.6%, di atas ambang 75%.',
-        time: '2 menit lalu',
+        title: 'Potensi Kebakaran!',
+        message: 'Suhu tinggi (36.4°C) terdeteksi bersamaan dengan tingkat asap Tinggi.',
+        time: '1 menit lalu',
+        level: AlertLevel.danger,
+      ),
+      _AlertData(
+        title: 'Asap Terdeteksi',
+        message: 'Kadar asap meningkat ke tingkat Sedang.',
+        time: '15 menit lalu',
         level: AlertLevel.warning,
       ),
       _AlertData(
         title: 'Suhu Normal',
-        message: 'Suhu kembali ke rentang normal (25–32°C).',
-        time: '15 menit lalu',
+        message: 'Suhu sensor DHT22 kembali stabil di bawah batas aman (31.2°C).',
+        time: '1 jam lalu',
         level: AlertLevel.info,
       ),
       _AlertData(
-        title: 'Kualitas Udara Baik',
-        message: 'PPM stabil di bawah 500 selama 1 jam terakhir.',
-        time: '1 jam lalu',
+        title: 'Sistem Terhubung',
+        message: 'ESP32 DevKit V1 berhasil tersambung ke Firebase Realtime Database.',
+        time: '2 jam lalu',
         level: AlertLevel.success,
       ),
-      _AlertData(
-        title: 'Koneksi Terputus',
-        message: 'ESP32 tidak mengirim data selama 30 detik.',
-        time: '2 jam lalu',
-        level: AlertLevel.danger,
-      ),
     ];
+
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
