@@ -144,5 +144,4 @@ Secara bawaan (*default*), aplikasi akan berjalan dalam **Demo Mode** menggunaka
 ## 📄 Lisensi & Kontributor
 
 - **Mata Kuliah**: Mobile & IoT (MIoT)
-- **Developer**: Kelompok IoT / Hafizh Habiibi & Tim
 - **Lisensi**: Bebas digunakan untuk keperluan akademik dan edukasi.
