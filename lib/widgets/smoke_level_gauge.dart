@@ -12,38 +12,34 @@ class SmokeLevelGauge extends StatelessWidget {
   Color _getStatusColor() {
     switch (smokeLevel) {
       case 'Rendah':
-        return const Color(0xFF4CAF50); // Green
+        return const Color(0xFF22C55E);
       case 'Normal':
-        return const Color(0xFF34D399); // Teal-Green
+        return const Color(0xFF06B6D4);
       case 'Sedang':
-        return const Color(0xFFF59E0B); // Orange
+        return const Color(0xFFF59E0B);
       case 'Tinggi':
-        return const Color(0xFFE24B4A); // Red
+        return const Color(0xFFEF4444);
       default:
-        return const Color(0xFF8888AA);
+        return const Color(0xFF94A3B8);
     }
   }
 
   Color _getBgStatusColor() {
     switch (smokeLevel) {
       case 'Rendah':
-        return const Color(0xFF1D3A1D);
+        return const Color(0xFFF0FDF4);
       case 'Normal':
-        return const Color(0xFF1E3A2F);
+        return const Color(0xFFECFDF5);
       case 'Sedang':
-        return const Color(0xFF2D2200);
+        return const Color(0xFFFFFBEB);
       case 'Tinggi':
-        return const Color(0xFF2D1010);
+        return const Color(0xFFFEF2F2);
       default:
-        return const Color(0xFF252540);
+        return const Color(0xFFF8FAFC);
     }
   }
 
   double _getPointerAngle() {
-    // Rendah: ~202.5 degrees (pointing bottom-left)
-    // Normal: ~247.5 degrees (pointing top-left)
-    // Sedang: ~292.5 degrees (pointing top-right)
-    // Tinggi: ~337.5 degrees (pointing bottom-right)
     switch (smokeLevel) {
       case 'Rendah':
         return math.pi + (math.pi / 8);
@@ -66,91 +62,164 @@ class SmokeLevelGauge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF252540),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF94A3B8).withAlpha((0.08 * 255).toInt()),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'TINGKAT ASAP (MQ-2)',
-            style: TextStyle(
-              fontSize: 11,
-              color: Color(0xFF8888AA),
-              letterSpacing: 0.8,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFF59E0B).withAlpha((0.25 * 255).toInt()),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.cloud_rounded, color: Colors.white, size: 22),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tingkat Asap',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                    Text(
+                      'Sensor MQ-2',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF94A3B8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: bgStatusColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: statusColor.withAlpha((0.3 * 255).toInt()),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      smokeLevel == 'Tinggi' || smokeLevel == 'Sedang'
+                          ? 'Waspada!'
+                          : 'Aman',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: statusColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
           Center(
             child: SizedBox(
-              width: 180,
-              height: 100,
+              width: 240,
+              height: 130,
               child: CustomPaint(
                 painter: _SmokeGaugePainter(
                   needleAngle: _getPointerAngle(),
                   activeColor: statusColor,
                 ),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          smokeLevel.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: statusColor,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const Text(
-                          'Tingkat Asap',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF8888AA),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: bgStatusColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircleAvatar(
-                    radius: 4,
-                    backgroundColor: statusColor,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    smokeLevel == 'Tinggi' || smokeLevel == 'Sedang'
-                        ? 'Waspada Asap!'
-                        : 'Udara Aman',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: statusColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _buildLevelIndicator('Rendah', const Color(0xFF22C55E), smokeLevel == 'Rendah'),
+              const SizedBox(width: 8),
+              _buildLevelIndicator('Normal', const Color(0xFF06B6D4), smokeLevel == 'Normal'),
+              const SizedBox(width: 8),
+              _buildLevelIndicator('Sedang', const Color(0xFFF59E0B), smokeLevel == 'Sedang'),
+              const SizedBox(width: 8),
+              _buildLevelIndicator('Tinggi', const Color(0xFFEF4444), smokeLevel == 'Tinggi'),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLevelIndicator(String label, Color color, bool isActive) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? color.withAlpha((0.1 * 255).toInt()) : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isActive ? color.withAlpha((0.4 * 255).toInt()) : const Color(0xFFE2E8F0),
+            width: isActive ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: isActive ? color : color.withAlpha((0.3 * 255).toInt()),
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                color: isActive ? color : const Color(0xFF94A3B8),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -170,65 +239,62 @@ class _SmokeGaugePainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height - 10;
     final radius = size.width / 2 - 10;
-    final strokeWidth = 10.0;
+    final strokeWidth = 12.0;
 
     final Rect rect = Rect.fromCircle(center: Offset(cx, cy), radius: radius);
 
-    // Draw 4 segments of the arc
-    // Segment 1: Rendah (Green)
+    // Background track
     canvas.drawArc(
       rect,
       math.pi,
-      math.pi / 4,
+      math.pi,
       false,
       Paint()
-        ..color = const Color(0xFF4CAF50).withAlpha((0.25 * 255).toInt())
+        ..color = const Color(0xFFF1F5F9)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round,
     );
-    // Segment 2: Normal (Teal)
+
+    // Segment 1: Rendah (Green)
     canvas.drawArc(
-      rect,
-      math.pi + (math.pi / 4),
-      math.pi / 4,
-      false,
+      rect, math.pi, math.pi / 4, false,
       Paint()
-        ..color = const Color(0xFF34D399).withAlpha((0.25 * 255).toInt())
+        ..color = const Color(0xFF22C55E).withAlpha((0.3 * 255).toInt())
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round,
+    );
+    // Segment 2: Normal (Cyan)
+    canvas.drawArc(
+      rect, math.pi + (math.pi / 4), math.pi / 4, false,
+      Paint()
+        ..color = const Color(0xFF06B6D4).withAlpha((0.3 * 255).toInt())
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth,
     );
     // Segment 3: Sedang (Orange)
     canvas.drawArc(
-      rect,
-      math.pi + (math.pi / 2),
-      math.pi / 4,
-      false,
+      rect, math.pi + (math.pi / 2), math.pi / 4, false,
       Paint()
-        ..color = const Color(0xFFF59E0B).withAlpha((0.25 * 255).toInt())
+        ..color = const Color(0xFFF59E0B).withAlpha((0.3 * 255).toInt())
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth,
     );
     // Segment 4: Tinggi (Red)
     canvas.drawArc(
-      rect,
-      math.pi + (3 * math.pi / 4),
-      math.pi / 4,
-      false,
+      rect, math.pi + (3 * math.pi / 4), math.pi / 4, false,
       Paint()
-        ..color = const Color(0xFFE24B4A).withAlpha((0.25 * 255).toInt())
+        ..color = const Color(0xFFEF4444).withAlpha((0.3 * 255).toInt())
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round,
     );
 
-    // Active color arc highlight up to needle angle
+    // Active highlight
     final sweepAngle = (needleAngle - math.pi).clamp(0.0, math.pi);
     canvas.drawArc(
-      rect,
-      math.pi,
-      sweepAngle,
-      false,
+      rect, math.pi, sweepAngle, false,
       Paint()
         ..color = activeColor
         ..style = PaintingStyle.stroke
@@ -236,30 +302,28 @@ class _SmokeGaugePainter extends CustomPainter {
         ..strokeCap = StrokeCap.round,
     );
 
-    // Draw needle pin center
-    final pinPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(cx, cy), 6, pinPaint);
-
-    final outerPinPaint = Paint()
+    // Needle center dot
+    canvas.drawCircle(Offset(cx, cy), 7, Paint()..color = Colors.white);
+    canvas.drawCircle(Offset(cx, cy), 7, Paint()
       ..color = activeColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-    canvas.drawCircle(Offset(cx, cy), 6, outerPinPaint);
+      ..strokeWidth = 2.5);
+    canvas.drawCircle(Offset(cx, cy), 3, Paint()..color = activeColor);
 
-    // Draw pointer needle line pointing to the angle
-    final needleLength = radius - 15;
+    // Needle line
+    final needleLength = radius - 18;
     final targetX = cx + needleLength * math.cos(needleAngle);
     final targetY = cy + needleLength * math.sin(needleAngle);
 
-    final needlePaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawLine(Offset(cx, cy), Offset(targetX, targetY), needlePaint);
+    canvas.drawLine(
+      Offset(cx, cy),
+      Offset(targetX, targetY),
+      Paint()
+        ..color = const Color(0xFF334155)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..strokeCap = StrokeCap.round,
+    );
   }
 
   @override

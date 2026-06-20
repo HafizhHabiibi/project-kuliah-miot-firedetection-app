@@ -64,28 +64,76 @@ class FirebaseService {
 
   // Stream of sensor data from Firebase or Mock
   Stream<SensorData> getSensorDataStream() {
+    debugPrint("🔍 Firebase.apps count: ${Firebase.apps.length}");
+    debugPrint("🔍 isFirebaseLive: $isFirebaseLive");
     if (isFirebaseLive) {
       try {
-        final DatabaseReference ref = FirebaseDatabase.instance.ref();
-        return ref.onValue.map((event) {
+        // Listen to the latest entry in sensor/history, ordered by timestamp
+        final query = FirebaseDatabase.instance
+            .ref('sensor/history')
+            .orderByChild('timestamp')
+            .limitToLast(1);
+        debugPrint("🔍 Listening to: sensor/history (limitToLast 1)");
+        return query.onValue.map((event) {
           final snapshot = event.snapshot;
+          debugPrint("📡 Firebase event received! exists=${snapshot.exists}");
           if (snapshot.exists && snapshot.value != null) {
-            // Check if values are directly at root or under a key
-            final data = Map<String, dynamic>.from(snapshot.value as Map);
-            return SensorData.fromJson(data);
+            final rootMap = Map<String, dynamic>.from(snapshot.value as Map);
+            // rootMap is {pushKey: {temperature: ..., humidity: ..., ...}}
+            // Get the first (and only) entry
+            final latestKey = rootMap.keys.first;
+            final latestData = Map<String, dynamic>.from(rootMap[latestKey] as Map);
+            debugPrint("📡 Latest data key=$latestKey: $latestData");
+            return SensorData.fromJson(latestData);
           }
           return SensorData.initial();
         }).handleError((error) {
-          debugPrint("Error reading Firebase data: $error. Falling back to mock data.");
+          debugPrint("❌ Error reading Firebase data: $error. Falling back to mock data.");
           return _getMockSensorDataStream();
         });
       } catch (e) {
-        debugPrint("Firebase failed to hook stream: $e. Falling back to mock data.");
+        debugPrint("❌ Firebase failed to hook stream: $e. Falling back to mock data.");
         return _getMockSensorDataStream();
       }
     } else {
-      debugPrint("Firebase is not initialized. Using Mock Data Stream.");
+      debugPrint("⚠️ Firebase is not initialized. Using Mock Data Stream.");
       return _getMockSensorDataStream();
+    }
+  }
+
+  // Stream of history data (last N entries) from Firebase
+  Stream<List<SensorData>> getHistoryStream({int limit = 20}) {
+    if (isFirebaseLive) {
+      try {
+        final query = FirebaseDatabase.instance
+            .ref('sensor/history')
+            .orderByChild('timestamp')
+            .limitToLast(limit);
+        return query.onValue.map((event) {
+          final snapshot = event.snapshot;
+          if (snapshot.exists && snapshot.value != null) {
+            final rootMap = Map<String, dynamic>.from(snapshot.value as Map);
+            final List<SensorData> history = [];
+            rootMap.forEach((key, value) {
+              final data = Map<String, dynamic>.from(value as Map);
+              history.add(SensorData.fromJson(data));
+            });
+            // Sort by timestamp ascending
+            history.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+            debugPrint("📊 History loaded: ${history.length} entries");
+            return history;
+          }
+          return <SensorData>[];
+        }).handleError((error) {
+          debugPrint("❌ Error reading history: $error");
+          return <SensorData>[];
+        });
+      } catch (e) {
+        debugPrint("❌ Failed to hook history stream: $e");
+        return Stream.value(<SensorData>[]);
+      }
+    } else {
+      return Stream.value(<SensorData>[]);
     }
   }
 
